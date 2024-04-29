@@ -76,4 +76,72 @@ class StudentController extends Controller
             ], 404);
         }
     }
+
+    public function edit($id)
+    {
+        $student = Student::find($id);
+        if ($student) {
+            return response()->json([
+                'status' => 200,
+                'student' => $student
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => "No Such Student Found!"
+            ], 404);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:200',
+            'course' => 'required|string|max:200',
+            'email' => 'required|email|max:100',
+            'phone' => 'required|digits:10'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'errors' => $validator->messages()
+            ], 422);
+        } else {
+            $student = Student::find($id);
+            if ($student) {
+                $student->name = $request->name;
+                $student->course = $request->course;
+                $student->email = $request->email;
+                $student->phone = $request->phone;
+                $student->save();
+                return response()->json([
+                    'status' => 200,
+                    'message' => "Student Updated Successful"
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 404,
+                    'message' => "No Such Student Found!"
+                ], 404);
+            }
+        }
+    }
+
+    public function destroy($id)
+    {
+        $student = Student::find($id);
+        if ($student) {
+            $student->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => "Student Deleted Successful"
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => "No Such Student Found!"
+            ], 404);
+        }
+    }
 }
